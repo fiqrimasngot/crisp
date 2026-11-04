@@ -57,19 +57,20 @@ to false. Failed tests or vulnerability checks prevent publication; a failure
 after pushing prevents a successful release handoff, not creation of the image.
 Only successful runs are eligible for GitOps promotion.
 
-The image is private by default. Publication does not establish kubelet pull
-access. The deployment worker must verify package access from the target
-namespace and use an approved read-only pull credential if needed. Do not make
-the repository or package public to work around an access problem.
+The source repository is public. Package visibility is separate: publication
+does not establish anonymous or kubelet pull access. The deployment worker must
+verify package access from the target namespace and use an approved read-only
+pull credential if needed. Do not change package visibility as a workaround.
 
 ## Protection and release gates
 
-The GitHub branch-protection and ruleset APIs returned HTTP 403 for this private
-repository: its plan requires an upgrade for those features. Do not claim that
-required checks or review approvals are enforced. The owner must enable an
-eligible plan, then require the exact check name `test` on main. A real reviewer
-must be chosen before adding required approvals; the only observed collaborator
-was the owner. Keep the repository private unless separately authorized.
+The owner authorized public repository visibility. Branch protection on `main`
+requires a pull request and the exact GitHub Actions check `test`, with the
+branch up to date before merging. It applies to administrators and prevents
+force pushes and branch deletion. No approvals are required: a separate eligible
+reviewer must be chosen before requiring them. Repository rulesets are empty.
+Private-repository protection has not been verified; a change back to private
+visibility requires checking plan eligibility and protection again.
 
 Model-owner confirmation of the canonical artifact, authoritative attribute
 labels and independent labelled acceptance data remain outside CI. Attributes
