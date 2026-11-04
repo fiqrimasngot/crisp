@@ -54,6 +54,7 @@ jobs:
     if: github.repository == 'fiqrimasngot/crisp' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: test
     runs-on: gha-crisp
+    environment: release
     timeout-minutes: 30
     permissions:
       contents: read
@@ -94,6 +95,8 @@ jobs:
           image="ghcr.io/fiqrimasngot/crisp@$DIGEST"
           docker buildx imagetools inspect "$image" > manifest.txt
           docker buildx imagetools inspect "$image" --raw > manifest.json
+          docker pull "$image"
+          docker run --rm -i --network none --read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges -e TF_NUM_INTRAOP_THREADS=2 -e TF_NUM_INTEROP_THREADS=1 "$image" python - < scripts/container_smoke.py
           python3 scripts/release_record.py
           cat release.json >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
