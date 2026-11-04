@@ -1,0 +1,25 @@
+name: Crisp runner smoke
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    if: github.repository == 'fiqrimasngot/crisp' && github.ref == 'refs/heads/main'
+    runs-on: gha-crisp
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Verify runner and public endpoints
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python3 --version
+          docker version
+          docker buildx version
+          getent hosts github.com ghcr.io results-receiver.actions.githubusercontent.com
+          curl --fail --silent --show-error --output /dev/null https://api.github.com
+          code=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' https://ghcr.io/v2/)
+          test "$code" = 401
