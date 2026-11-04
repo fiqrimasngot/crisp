@@ -25,6 +25,12 @@ access. It does not deploy to Kubernetes or claim classification accuracy.
 Run `runner-smoke.yaml` in each repository to check checkout, Python, Docker,
 Buildx, DNS and HTTPS. Runner registration alone is not a workflow test.
 
+The Crisp runner scales from zero to one job at a time. BuildKit uses the DinD
+host network, which is the runner pod network, not the Kubernetes node network.
+The measured pod MTU is 1280 while Docker's default bridge MTU is 1500. The
+default bridge caused GHCR TLS handshakes to time out during layer publication;
+using the pod network avoids that mismatch without opening cluster egress.
+
 ## Checks and publication
 
 The `test` job checks fatal Python lint errors, high-confidence/high-severity
