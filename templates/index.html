@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crisp fabric condition detector</title></head>
+<body>
+<main>
+<h1>Crisp fabric condition detector</h1>
+<p>Predictions come from the pinned Keras model. Attribute predictions are omitted until their authoritative label order is supplied.</p>
+<form id="form"><label>Image <input id="image" name="image" type="file" accept="image/*" required></label><button>Analyze</button></form>
+<pre id="result" role="status"></pre>
+</main>
+<script>
+const form=document.getElementById('form'); const result=document.getElementById('result');
+form.addEventListener('submit', async (event) => {
+  event.preventDefault(); result.textContent='Analyzing…';
+  const data=new FormData(form);
+  try { const response=await fetch('/predict',{method:'POST',body:data}); const payload=await response.json();
+    if (!response.ok) throw new Error(payload.error || 'inference failed');
+    result.textContent=JSON.stringify(payload,null,2);
+  } catch (error) { result.textContent='Error: '+error.message; }
+});
+</script>
+</body>
+</html>
